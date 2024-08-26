@@ -25,7 +25,7 @@ jobs:
         git fetch upstream
 
     - name: Set branch name
-      run: echo "BRANCH_NAME=week05" >> $GITHUB_ENV
+      run: echo "BRANCH_NAME=week06" >> $GITHUB_ENV
 
     - name: Create or checkout branch
       run: |
