@@ -1,0 +1,48 @@
+# .github/workflows/auto-create-branch-and-sync.yml
+
+name: Auto Create Branch and Sync Upstream
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # 每周一的00:00 UTC运行
+
+jobs:
+  create-and-sync-branch:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        ref: main # 或者你当前所在的主分支
+        fetch-depth: 0
+
+    - name: Set up git
+      run: |
+        git config user.name "${{ github.actor }}"
+        git config user.email "${{ github.actor }}@users.noreply.github.com"
+
+    - name: Calculate new branch name
+      id: calculate-branch
+      run: |
+        # 获取当前分支的最新week分支名称
+        last_week_branch=$(git branch -r | grep -Eo 'origin/week[0-9]+' | sort | tail -1)
+        # 提取数字部分并加1
+        new_week_number=$(echo $last_week_branch | grep -Eo '[0-9]+' | awk '{print $1+1}')
+        echo "new_branch=week${new_week_number}" >> $GITHUB_ENV
+
+    - name: Create new branch
+      run: |
+        git checkout -b ${{ env.new_branch }}
+
+    - name: Sync with upstream
+      run: |
+        # 添加上游仓库
+        git remote add upstream https://github.com/mq-soft-tech/comp2000_2024.git
+        git fetch upstream
+        git merge upstream/main --no-edit # 合并上游最新代码
+        git push origin ${{ env.new_branch }}
+
+    - name: Push branch to origin
+      run: |
+        git push origin ${{ env.new_branch }}
