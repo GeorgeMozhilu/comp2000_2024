@@ -41,7 +41,7 @@ jobs:
         # 添加上游仓库
         git remote add upstream https://github.com/mq-soft-tech/comp2000_2024.git
         git fetch upstream
-        git merge upstream/main --no-edit # 合并上游最新代码
+        git merge upstream/week01 --no-edit # 合并上游最新代码
         git push origin ${{ env.new_branch }}
 
     - name: Push branch to origin
