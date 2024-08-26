@@ -1,0 +1,38 @@
+name: Update from Upstream
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Run every Monday at midnight
+  workflow_dispatch:
+
+jobs:
+  update_from_upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Determine upstream branch
+        run: |
+          if [[ $(git remote show origin | grep 'fetch' | cut -d ' ' -f 3) == "main" ]]; then
+            upstream_branch=main
+          else
+            upstream_branch=$(git remote show origin | grep 'fetch' | cut -d ' ' -f 3)
+          fi
+      - name: Check for upstream updates
+        run: |
+          if [[ $(git rev-parse --verify HEAD) != $(git fetch origin $upstream_branch --quiet --tags && git rev-parse --verify FETCH_HEAD) ]]; then
+            echo "Upstream has updates. Creating new branch."
+          else
+            echo "Upstream is up-to-date. No updates needed."
+          fi
+      - name: Create new branch
+        run: |
+          if [[ $(git rev-parse --verify HEAD) != $(git fetch origin $upstream_branch --quiet --tags && git rev-parse --verify FETCH_HEAD) ]]; then
+            current_week=$(date +%U)
+            new_branch_name="week$current_week"
+            git checkout -b $new_branch_name
+          fi
+      - name: Update from upstream
+        run: |
+          if [[ $(git rev-parse --verify HEAD) != $(git fetch origin $upstream_branch --quiet --tags && git rev-parse --verify FETCH_HEAD) ]]; then
+            git merge origin/$upstream_branch
+          fi
