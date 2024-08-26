@@ -15,7 +15,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v3
       with:
-        ref: main # 或者你当前所在的主分支
+        ref: week01 # 或者你当前所在的主分支
         fetch-depth: 0
 
     - name: Set up git
