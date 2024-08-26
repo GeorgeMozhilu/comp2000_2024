@@ -1,0 +1,41 @@
+name: Update Fork
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天运行一次
+  workflow_dispatch: # 手动触发工作流
+
+jobs:
+  update-fork:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Set up Git
+      run: |
+        git config --global user.name "GeorgeMozhilu"
+        git config --global user.email "luxinyang12135@gmail.com"
+
+    - name: Add upstream repository
+      run: |
+        git remote add upstream https://github.com/mq-soft-tech/comp2000_2024.git
+        git fetch upstream
+
+    - name: Set branch name
+      run: echo "BRANCH_NAME=week05" >> $GITHUB_ENV
+
+    - name: Create or checkout branch
+      run: |
+        if git rev-parse --verify origin/${{ env.BRANCH_NAME }}; then
+          git checkout ${{ env.BRANCH_NAME }}
+        else
+          git checkout -b ${{ env.BRANCH_NAME }}
+        fi
+
+    - name: Update branch
+      run: |
+        git merge upstream/${{ env.BRANCH_NAME }}
+        git push origin ${{ env.BRANCH_NAME }}
