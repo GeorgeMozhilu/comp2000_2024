@@ -10,6 +10,16 @@ public abstract class Actor {
   boolean humanPlayer;
   int moves;
   int turns;
+  MoveStrategy moveStrategy;
+
+  public void setMoveStrategy(MoveStrategy strategy) {
+    moveStrategy = strategy;
+  }
+
+  public void move(List<Cell> possibleLocs) {
+    Cell newLoc = moveStrategy.getNextMove(possibleLocs);
+    setLocation(newLoc);
+  }
 
   protected Actor(Cell inLoc, Color inColor, Boolean isHuman, int inMoves) {
     loc = inLoc;

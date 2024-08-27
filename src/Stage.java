@@ -29,8 +29,15 @@ public class Stage {
       for(Actor a: actors) {
         if(!a.isHuman()) {
           List<Cell> possibleLocs = getClearRadius(a.loc, a.moves);
-          int moveBotChooses = (new Random()).nextInt(possibleLocs.size());
-          a.setLocation(possibleLocs.get(moveBotChooses));
+          MoveStrategy strategy;
+          
+          if (a.loc.row % 2 == 0) {
+            strategy = new RandomMoveStrategy();
+          } else {
+            strategy = new LeftMostMoveStrategy();
+          }
+          a.setMoveStrategy(strategy);
+          a.move(possibleLocs);
         }
       }
       currentState = State.ChoosingActor;
