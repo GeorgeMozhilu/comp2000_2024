@@ -3,18 +3,19 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-public class Grid {
+public class Grid implements Iterable<Cell> {
   Cell[][] cells = new Cell[20][20];
-  
+
   public Grid() {
-    for(int i=0; i<cells.length; i++) {
-      for(int j=0; j<cells[i].length; j++) {
-        cells[i][j] = new Cell(colToLabel(i), j, 10+Cell.size*i, 10+Cell.size*j);
+    for (int i = 0; i < cells.length; i++) {
+      for (int j = 0; j < cells[i].length; j++) {
+        cells[i][j] = new Cell(colToLabel(i), j, 10 + Cell.size * i, 10 + Cell.size * j);
       }
     }
   }
@@ -28,11 +29,11 @@ public class Grid {
   }
 
   public void paint(Graphics g, Point mousePos) {
-    doToEachCell( (Cell c) -> c.paint(g, mousePos) );
+    doToEachCell((Cell c) -> c.paint(g, mousePos));
   }
 
   public Optional<Cell> cellAtColRow(int c, int r) {
-    if(c >= 0 && c < cells.length && r >=0 && r < cells[c].length) {
+    if (c >= 0 && c < cells.length && r >= 0 && r < cells[c].length) {
       return Optional.of(cells[c][r]);
     } else {
       return Optional.empty();
@@ -44,11 +45,9 @@ public class Grid {
   }
 
   public Optional<Cell> cellAtPoint(Point p) {
-    for(int i=0; i < cells.length; i++) {
-      for(int j=0; j < cells[i].length; j++) {
-        if(cells[i][j].contains(p)) {
-          return Optional.of(cells[i][j]);
-        }
+    for (Cell cell : this) {
+      if (cell.contains(p)) {
+        return Optional.of(cell);
       }
     }
     return Optional.empty();
@@ -57,13 +56,12 @@ public class Grid {
   /**
    * Takes a cell consumer (i.e. a function that has a single `Cell` argument and
    * returns `void`) and applies that consumer to each cell in the grid.
+   * 
    * @param func The `Cell` to `void` function to apply at each spot.
    */
   public void doToEachCell(Consumer<Cell> func) {
-    for(int i=0; i < cells.length; i++) {
-      for(int j=0; j < cells[i].length; j++) {
-        func.accept(cells[i][j]);
-      }
+    for (Cell cell : this) {
+      func.accept(cell);
     }
   }
 
@@ -72,22 +70,50 @@ public class Grid {
     int j = from.row;
     Set<Cell> inRadius = new HashSet<Cell>();
     if (size > 0) {
-        cellAtColRow(colToLabel(i), j - 1).ifPresent(inRadius::add);
-        cellAtColRow(colToLabel(i), j + 1).ifPresent(inRadius::add);
-        cellAtColRow(colToLabel(i - 1), j).ifPresent(inRadius::add);
-        cellAtColRow(colToLabel(i + 1), j).ifPresent(inRadius::add);
+      cellAtColRow(colToLabel(i), j - 1).ifPresent(inRadius::add);
+      cellAtColRow(colToLabel(i), j + 1).ifPresent(inRadius::add);
+      cellAtColRow(colToLabel(i - 1), j).ifPresent(inRadius::add);
+      cellAtColRow(colToLabel(i + 1), j).ifPresent(inRadius::add);
     }
 
-    for(Cell c: inRadius.toArray(new Cell[0])) {
-        inRadius.addAll(getRadius(c, size - 1));
+    for (Cell c : inRadius.toArray(new Cell[0])) {
+      inRadius.addAll(getRadius(c, size - 1));
     }
     return new ArrayList<Cell>(inRadius);
   }
 
   public void paintOverlay(Graphics g, List<Cell> cells, Color color) {
     g.setColor(color);
-    for(Cell c: cells) {
-      g.fillRect(c.x+2, c.y+2, c.width-4, c.height-4);
+    for (Cell c : cells) {
+      g.fillRect(c.x + 2, c.y + 2, c.width - 4, c.height - 4);
+    }
+  }
+
+  // Implement the Iterable interface
+  @Override
+  public Iterator<Cell> iterator() {
+    return new GridIterator();
+  }
+
+  // Inner class that implements the Iterator for Grid
+  private class GridIterator implements Iterator<Cell> {
+    private int row = 0;
+    private int col = 0;
+
+    @Override
+    public boolean hasNext() {
+      return row < cells.length && col < cells[row].length;
+    }
+
+    @Override
+    public Cell next() {
+      Cell cell = cells[row][col];
+      col++;
+      if (col >= cells[row].length) {
+        col = 0;
+        row++;
+      }
+      return cell;
     }
   }
 }
