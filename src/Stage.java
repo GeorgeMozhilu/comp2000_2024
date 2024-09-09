@@ -28,7 +28,7 @@ public class Stage {
       for(Actor a: actors) {
         if(!a.isHuman()) {
           List<Cell> possibleLocs = getClearRadius(a.loc, a.moves);
-          Cell nextLoc = a.strat.chooseNextLoc(possibleLocs);
+          Cell nextLoc = a.start.chooseNextLoc(possibleLocs);
           a.setLocation(nextLoc);
         }
       }
@@ -75,7 +75,7 @@ public class Stage {
       g.drawString("artificiality:", labelIndent, yLoc+2*vTab);
       g.drawString(a.isHuman() ? "Human" : "Bot", valueIndent, yLoc+2*vTab);
       g.drawString("strategy:", labelIndent, yLoc+3*vTab);
-      g.drawString(a.strat.toString(), valueIndent, yLoc+3*vTab);
+      g.drawString(a.start.toString(), valueIndent, yLoc+3*vTab);
     }    
   }
 

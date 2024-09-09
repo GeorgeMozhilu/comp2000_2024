@@ -10,7 +10,7 @@ public abstract class Actor {
   boolean humanPlayer;
   int moves;
   int turns;
-  MoveStrategy strat;
+  MoveStrategy start;
 
   protected Actor(Cell inLoc, Color inColor, Boolean isHuman, int inMoves) {
     setLocation(inLoc);
@@ -39,9 +39,9 @@ public abstract class Actor {
   public void setLocation(Cell inLoc) {
     loc = inLoc;
     if(loc.row % 2 == 0) {
-      strat = new RandomMove();
+      start = new RandomMove();
     } else {
-      strat = new LeftMostMove();
+      start = new LeftMostMove();
     }
     setPoly();
   }
