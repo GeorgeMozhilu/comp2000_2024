@@ -14,15 +14,15 @@ public class BotMovingState extends StateCommon {
 
   public void paint(Graphics g, Point mouseLocs) {
     // do we have AI moves to make?
-    for(Actor a: stage.actors) {
-      if(!a.isHuman()) {
+    for (Actor a : stage.actors) {
+      if (!a.isHuman()) {
         List<Cell> possibleLocs = getClearRadius(a.loc, a.moves);
         Cell nextLoc = a.strat.chooseNextLoc(possibleLocs);
         a.setLocation(nextLoc);
       }
     }
     stage.currentState = new ChoosingActorState(stage);
-    for(Actor a: stage.actors) {
+    for (Actor a : stage.actors) {
       a.turns = 1;
     }
   }
@@ -31,16 +31,16 @@ public class BotMovingState extends StateCommon {
     // task 20
     // create a Set of Actor locations that can be filtered out
     final Set<Cell> actorLocs = new HashSet<Cell>(
-      stage.actors.stream().map(a -> a.loc).collect(Collectors.toSet())
-    );
+        stage.actors.stream().map(a -> a.loc).collect(Collectors.toSet()));
+
     // un-comment the following lines and complete them
-    //Stream<Cell> init = stage.grid.getRadius(from, size)
-    //Stream<Cell> clear = 
-    //return clear.collect(Collectors.toList());
+    // Stream<Cell> init = stage.grid.getRadius(from, size)
+    // Stream<Cell> clear =
+    // return clear.collect(Collectors.toList());
 
     // remove the lines below
     List<Cell> init = stage.grid.getRadius(from, size);
-    for(Actor a: stage.actors) {
+    for (Actor a : stage.actors) {
       init.remove(a.loc);
     }
     return init;
